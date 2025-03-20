@@ -5,8 +5,15 @@ import nibabel as nib
 
 # Import dataset
 def mask_dataset_import(pred_path, truth_path):
+    """
+        Calculating the dice of predicted labels versus
+        truths for a given dataset
+        """
+    # Lists all truth labels within the directory path provided
     truth_uid = os.listdir(truth_path)
     print(truth_uid)
+
+    # Lists all predicted labels within the directory path provided
     pred_uid = os.listdir(pred_path)
     dice = 0
     for uid in truth_uid:
@@ -15,13 +22,22 @@ def mask_dataset_import(pred_path, truth_path):
         print(pred_file_path)
         truth_file_path = os.path.join(truth_path, uid)
         print(truth_file_path)
+
+        # Obtaining array data of the predicted label
         pred_nib = nib.load(pred_file_path)
         pred_data = pred_nib.get_fdata()
+
+        # Obtaining array data of the GT label
         truth_nib = nib.load(truth_file_path)
         truth_data = truth_nib.get_fdata()
+
+        # Utilizing dice function above for each z slice
         uid_dice = calculate_dice(pred_data, truth_data)
         print(uid_dice)
+
+        # Adding the dice for each slice
         dice += uid_dice
+        
     print('dice score:', dice/len(truth_uid))
 
 
