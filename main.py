@@ -32,7 +32,7 @@ def mask_dataset_import(pred_path, truth_path):
         truth_data = truth_nib.get_fdata()
 
         # Utilizing dice function above for each z slice
-        uid_dice = calculate_dice(pred_data, truth_data)
+        uid_dice = dice_coefficient(pred_data, truth_data)
         print(uid_dice)
 
         # Adding the dice for each slice
@@ -41,24 +41,17 @@ def mask_dataset_import(pred_path, truth_path):
     print('dice score:', dice/len(truth_uid))
 
 
-def calculate_dice(pred_data, truth_data):
-    z_range = range(pred_data.shape[-1])
-    z_len = len(z_range)
-    dice_sum = 0
-    for z in z_range:
-        pred_slice = pred_data[:, :, z]
-        truth_slice = truth_data[:, :, z]
-        slice_dice = single_dice(pred_slice, truth_slice)
-        dice_sum += slice_dice
+def dice_coefficient(seg_pred, seg_gt):
+    """
+    Compute the Dice Coefficient for binary segmentations.
+    """
+    intersection = np.logical_and(seg_pred, seg_gt).sum()
+    volume_sum = seg_pred.sum() + seg_gt.sum()
 
-    return dice_sum / z_len
+    if volume_sum == 0:
+        return 1.0 if intersection == 0 else 0.0  # Handle empty cases
 
-
-def single_dice(pred, truth):
-    intersection = np.sum(truth * pred)
-    if (np.sum(truth) == 0) and (np.sum(pred) == 0):
-        return 1
-    return (2 * intersection) / (np.sum(truth) + np.sum(pred))
+    return 2.0 * intersection / volume_sum
 
 
 mask_dataset_import('data/preds/',
