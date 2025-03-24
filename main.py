@@ -35,11 +35,6 @@ def mask_dataset_import(pred_path, truth_path):
         uid_dice = dice_coefficient(pred_data, truth_data)
         print(uid_dice)
 
-        # Adding the dice for each slice
-        dice += uid_dice
-        
-    print('dice score:', dice/len(truth_uid))
-
 
 def dice_coefficient(seg_pred, seg_gt):
     """
